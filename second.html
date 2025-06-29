@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Subscriber Analytics | Real-time Tracker</title>
+    <meta name="description" content="Track real-time YouTube subscriber counts for any channel with our professional analytics tool">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --youtube-red: #ff0000;
+            --youtube-dark-red: #cc0000;
+            --primary: #ff0000; /* Changed to YouTube red */
+            --primary-dark: #cc0000; /* Darker red */
+            --secondary: #d50000; /* Complementary red */
+            --accent: #ff3333; /* Lighter red */
+            --success: #4cc9f0;
+            --error: #f72585;
+            --text-dark: #2b2d42;
+            --text-medium: #4a4e69;
+            --text-light: #8e9aaf;
+            --bg-light: #f8f9fa;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f5f7ff;
+            background-image: radial-gradient(circle at 10% 20%, rgba(255, 0, 0, 0.1) 0%, rgba(248, 249, 250, 1) 90%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 40px;
+            max-width: 560px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .logo {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            color: var(--youtube-red); /* YouTube red */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo svg {
+            width: 1em;
+            height: 1em;
+            margin-right: 10px;
+            fill: var(--youtube-red); /* YouTube red */
+        }
+
+        h1 {
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: var(--text-medium);
+            margin-bottom: 30px;
+            font-size: 1rem;
+            font-weight: 400;
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text-medium);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e0e3ff;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.2); /* Red shadow */
+            background-color: white;
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--text-light);
+            opacity: 0.7;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 16px 30px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .btn:hover::after {
+            opacity: 1;
+        }
+
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .btn:disabled::after {
+            display: none;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            opacity: 0.9;
+            z-index: 0;
+        }
+
+        .result.success {
+            background: linear-gradient(135deg, var(--success), var(--accent));
+            color: white;
+        }
+
+        .result.error {
+            background: linear-gradient(135deg, var(--error), #f77f00);
+            color: white;
+        }
+
+        .channel-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .channel-thumbnail {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 15px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            object-fit: cover;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .channel-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .subscriber-count {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin: 15px 0;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .auto-refresh {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .refresh-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+
+        .examples {
+            margin-top: 25px;
+            padding: 18px;
+            background: var(--bg-light);
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+            color: var(--text-medium);
+            text-align: left;
+            border: 1px solid #e0e3ff;
+        }
+
+        .examples strong {
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .examples ul {
+            list-style-type: none;
+            margin-top: 8px;
+        }
+
+        .examples li {
+            margin-bottom: 6px;
+            position: relative;
+            padding-left: 18px;
+        }
+
+        .examples li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .demo-notice {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(5px);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px;
+            }
+            
+            .logo {
+                font-size: 2.2rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .subtitle {
+                font-size: 0.95rem;
+                max-width: 100%;
+            }
+            
+            .subscriber-count {
+                font-size: 2.2rem;
+            }
+            
+            .channel-info {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .channel-thumbnail {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+
+        /* Animation for the result box */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        /* Pulse animation for the count */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        .subscriber-count.updated {
+            animation: pulse 0.6s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+            </svg>
+            YouTube Analytics
+        </div>
+        <h1>Subscriber Tracker</h1>
+        <p class="subtitle">Monitor real-time subscriber counts and growth analytics for any YouTube channel</p>
+        
+        <form id="channelForm">
+            <div class="form-group">
+                <label for="channelInput">Channel Identifier</label>
+                <input type="text" id="channelInput" name="channel_input" placeholder="Enter channel handle (@username), ID (UC...) or custom URL" required>
+            </div>
+            <button type="submit" class="btn" id="submitBtn">
+                <span>Analyze Channel</span>
+            </button>
+        </form>
+
+        <div class="examples">
+            <strong>Need help finding channel identifiers?</strong>
+            <ul>
+                <li>Channel handle: @MrBeast or @DhruvRathee</li>
+                <li>Channel ID: UCX6OQ3DkcsbYNE6H8uQQuVA</li>
+                <li>Custom URL: youtube.com/c/PewDiePie</li>
+            </ul>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Retrieving channel analytics...</p>
+        </div>
+
+        <div class="result" id="result">
+            <div class="channel-info">
+                <img class="channel-thumbnail" id="channelThumbnail" src="" alt="Channel Thumbnail" onerror="this.style.display='none'">
+                <div>
+                    <div class="channel-name" id="channelName"></div>
+                </div>
+            </div>
+            <div class="subscriber-count" id="subscriberCount"></div>
+            <div class="auto-refresh" id="autoRefresh">
+                Auto-updating every 30 seconds
+                <span class="refresh-indicator" id="refreshIndicator" style="display: none;"></span>
+            </div>
+            <div id="demoNotice" class="demo-notice" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        let refreshInterval;
+        let currentChannelInput = '';
+
+        document.getElementById('channelForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const channelInput = document.getElementById('channelInput').value.trim();
+            if (channelInput) {
+                currentChannelInput = channelInput;
+                getSubscriberCount(channelInput);
+            }
+        });
+
+        function getSubscriberCount(channelInput, isAutoRefresh = false) {
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            const refreshIndicator = document.getElementById('refreshIndicator');
+
+            if (!isAutoRefresh) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span>Processing...</span>';
+                loading.style.display = 'block';
+                result.style.display = 'none';
+                
+                if (refreshInterval) clearInterval(refreshInterval);
+            } else {
+                refreshIndicator.style.display = 'inline-block';
+            }
+
+            // Simulated API call - replace with your actual API endpoint
+            fetch('https://o2c5yz1sy0.execute-api.ap-south-1.amazonaws.com/dev/YTSubCountLambda?username=' + encodeURIComponent(channelInput), {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!isAutoRefresh) {
+                    loading.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span>Analyze Channel</span>';
+                } else {
+                    refreshIndicator.style.display = 'none';
+                }
+
+                if (data.success) {
+                    showSuccess(data);
+                    if (!isAutoRefresh) startAutoRefresh();
+                } else {
+                    showError(data.error || 'Unable to retrieve channel data');
+                }
+            })
+            .catch(error => {
+                if (!isAutoRefresh) {
+                    loading.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span>Analyze Channel</span>';
+                } else {
+                    refreshIndicator.style.display = 'none';
+                }
+                showError('Network error. Please try again.');
+                console.error('Error:', error);
+            });
+        }
+
+        function showSuccess(data) {
+            const result = document.getElementById('result');
+            const channelName = document.getElementById('channelName');
+            const subscriberCount = document.getElementById('subscriberCount');
+            const channelThumbnail = document.getElementById('channelThumbnail');
+            const demoNotice = document.getElementById('demoNotice');
+
+            channelName.textContent = data.channel_title || 'Channel';
+            
+            // Add pulse animation when count updates
+            subscriberCount.classList.remove('updated');
+            void subscriberCount.offsetWidth; // Trigger reflow
+            subscriberCount.textContent = formatNumber(data.subscriber_count) + ' subscribers';
+            subscriberCount.classList.add('updated');
+
+            if (data.thumbnail) {
+                channelThumbnail.src = data.thumbnail;
+                channelThumbnail.style.display = 'block';
+            } else {
+                channelThumbnail.style.display = 'none';
+            }
+
+            if (data.demo_mode) {
+                demoNotice.textContent = data.message || 'Demo data shown for illustration';
+                demoNotice.style.display = 'block';
+            } else {
+                demoNotice.style.display = 'none';
+            }
+
+            result.className = 'result success';
+            result.style.display = 'block';
+        }
+
+        function showError(message) {
+            const result = document.getElementById('result');
+            result.innerHTML = `
+                <div style="position: relative; z-index: 1;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 15px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <div style="font-size: 1.1rem; font-weight: 600;">${message}</div>
+                </div>
+            `;
+            result.className = 'result error';
+            result.style.display = 'block';
+            
+            // Clear auto-refresh on error
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        }
+
+        function formatNumber(num) {
+            const number = parseInt(num);
+            if (isNaN(number)) return 'N/A';
+            
+            if (number >= 1000000000) {
+                return (number / 1000000000).toFixed(1) + 'B';
+            } else if (number >= 1000000) {
+                return (number / 1000000).toFixed(1) + 'M';
+            } else if (number >= 1000) {
+                return (number / 1000).toFixed(1) + 'K';
+            }
+            return number.toLocaleString();
+        }
+
+        function startAutoRefresh() {
+            refreshInterval = setInterval(() => {
+                if (currentChannelInput) {
+                    getSubscriberCount(currentChannelInput, true);
+                }
+            }, 30000); // Refresh every 30 seconds
+        }
+
+        // Clear interval when page is unloaded
+        window.addEventListener('beforeunload', function() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
+
+        // Focus the input field on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('channelInput').focus();
+        });
+    </script>
+</body>
+</html>
