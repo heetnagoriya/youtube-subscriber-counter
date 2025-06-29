@@ -22,8 +22,6 @@ A sleek and modern real-time web application to fetch and display **live subscri
 
 ✅ Real-time subscriber count for any public YouTube channel  
 ✅ Input support for: Any Youtube Channel Name/URL/ Channel I'D
-
-
 ✅ Auto-refresh every 30 seconds  
 ✅ Mobile-responsive & modern gradient UI  
 ✅ Spinner & error messages with graceful UX handling
@@ -64,7 +62,7 @@ youtube-subscriber-counter/
 
 ## 🧑‍💻 Author
 
-**Heet N.**  
+**Heet Nagoriya**  
 🔗 [GitHub Profile](https://github.com/heetnagoriya)  
 📧 [Email](heetnagoriya@gmail.com) 
 💼 Passionate about Backend Engineering, AWS, and building full-stack solutions.
